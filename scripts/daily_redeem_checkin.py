@@ -1,4 +1,3 @@
-from select import select
 from selenium import webdriver
 import time
 
