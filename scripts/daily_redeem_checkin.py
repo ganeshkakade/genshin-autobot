@@ -1,4 +1,5 @@
 from selenium import webdriver
+import pickle
 import time
 
 daily_checkin_url = "https://webstatic-sea.mihoyo.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481"
@@ -9,6 +10,7 @@ msedgedriver = "msedgedriver.exe"
 username = "" # mihoyo genshin username
 password = "" # mihoyo genshin password
 default_server = "Asia" # "America" "Europe" "Asia" "TW, HK, MO"
+pickle_file_path = "scripts/genshin_mihoyo.pkl"
 
 browser = webdriver.Edge(msedgedriver)
 codes = []
@@ -31,12 +33,41 @@ def load_refresh_url(url):
 def scrap_redeem_codes():
     load_url(redeem_scraping_url)
 
-    code_list = browser.find_elements_by_xpath('//article/div[@class="entry-content"]/ul[1]/li')
+    code_list = browser.find_elements_by_xpath('//*[@id="site_wrap"]/article/div/ul[1]/li')
 
     for item in code_list:
         code = item.find_element_by_tag_name('strong')
         code = code.text.strip()
         codes.append(code)
+
+def load_cookies():
+    try:
+        with open(pickle_file_path, "rb") as f:
+            file = pickle.load(f)
+            for cookie in file: 
+                browser.add_cookie(cookie)
+
+    except:
+        print("file error in load_cookies")
+
+def save_cookies():
+    pickle.dump(browser.get_cookies(), open(pickle_file_path, "wb"))
+
+def is_cookies_exists():
+    try:
+        with open(pickle_file_path, "rb") as f:
+            return True
+
+    except:
+        print("file error in is_cookies_exists")
+        return False
+
+def is_cookies_expired():
+    return True
+
+def delete_cookie_relogin():
+    browser.delete_all_cookies()
+    auto_login()
 
 def auto_login():
     load_url(login_url)
@@ -56,8 +87,11 @@ def auto_login():
     # wait time for log in to complete
     # for now, user will solve the challenge manually
     wait_time(20)
+    
+    # dump existing loggedin cookies
+    save_cookies()
 
-def auto_daily_checkin():
+def daily_checkin_process():
     load_refresh_url(daily_checkin_url)
 
     active_item = browser.find_elements_by_xpath('//div[@class="components-home-assets-__sign-content_---item---1VLDOZ components-home-assets-__sign-content_---active---36unD3"]')
@@ -68,9 +102,21 @@ def auto_daily_checkin():
     # wait time for checkin completion
     wait_time(5)
 
-def auto_redeem_code():
-    scrap_redeem_codes()
+def auto_daily_checkin():
+    if is_cookies_exists():
+        load_url(daily_checkin_url)
+        load_cookies() # load cookies for daily_checkin_url
 
+        # not implemented, no cookies get expired??
+        # if is_cookies_expired():
+        #     delete_cookie_relogin()
+
+        daily_checkin_process()
+    else:
+        auto_login()
+        daily_checkin_process()
+
+def redeem_process():
     load_url(redeem_code_url)
 
     # open div dropdown
@@ -99,9 +145,24 @@ def auto_redeem_code():
         # wait for redeem completion
         wait_time(5)
 
+def auto_redeem_code():
+    scrap_redeem_codes()
+
+    if is_cookies_exists():
+        load_url(redeem_code_url)
+        load_cookies() # load cookies for redeem_code_url
+
+        # not implemented, no cookies get expired??
+        # if is_cookies_expired():
+        #     delete_cookie_relogin()
+
+        redeem_process()
+    else:
+        auto_login()
+        redeem_process()
+
 if __name__ == "__main__":
-    auto_login() # user must be logged in to execute below functions
-    auto_redeem_code() # this can be only called after auto_login function
+    auto_redeem_code()
     auto_daily_checkin()
     
     browser.close()
