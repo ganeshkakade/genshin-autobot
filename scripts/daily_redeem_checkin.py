@@ -15,8 +15,9 @@ dir = os.path.dirname(__file__)
 msedgedriver = os.path.join(dir, '../drivers/msedgedriver_97.0.1072.69.exe')
 pickle_file_path = os.path.join(dir, 'genshin_mihoyo.pkl')
 
-
 browser = webdriver.Edge(msedgedriver)
+browser.maximize_window()
+
 codes = []
 
 def wait_time(t):
