@@ -1,16 +1,20 @@
 from selenium import webdriver
 import pickle
 import time
+import os
 
 daily_checkin_url = "https://webstatic-sea.mihoyo.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481"
 login_url = "https://genshin.mihoyo.com/en/news"
 redeem_code_url = "https://genshin.mihoyo.com/en/gift"
 redeem_scraping_url = "https://www.pockettactics.com/genshin-impact/codes"
-msedgedriver = "drivers/msedgedriver.exe"
 username = "" # mihoyo genshin username
 password = "" # mihoyo genshin password
 default_server = "Asia" # "America" "Europe" "Asia" "TW, HK, MO"
-pickle_file_path = "scripts/genshin_mihoyo.pkl"
+
+dir = os.path.dirname(__file__)
+msedgedriver = os.path.join(dir, '../drivers/msedgedriver.exe')
+pickle_file_path = os.path.join(dir, 'genshin_mihoyo.pkl')
+
 
 browser = webdriver.Edge(msedgedriver)
 codes = []
