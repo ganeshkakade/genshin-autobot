@@ -45,6 +45,11 @@ def scrap_redeem_codes():
         code = code.text.strip()
         codes.append(code)
 
+def accept_cookie_dialogue(elem_xpath):
+    dialogue_btn = browser.find_elements_by_xpath(elem_xpath)
+    if dialogue_btn:
+        dialogue_btn[0].click()
+
 def load_cookies():
     try:
         with open(pickle_file_path, "rb") as f:
@@ -76,6 +81,7 @@ def delete_cookie_relogin():
 
 def auto_login():
     load_url(login_url)
+    accept_cookie_dialogue('//div[@class="mihoyo-cookie-tips__button mihoyo-cookie-tips__button--ys"]')
 
     login = browser.find_elements_by_xpath("//button[@class='login__btn']")
     login[0].click()
@@ -98,6 +104,7 @@ def auto_login():
 
 def daily_checkin_process():
     load_refresh_url(daily_checkin_url)
+    accept_cookie_dialogue('//button[@class="mihoyo-cookie-tips__button mihoyo-cookie-tips__button--hk4e"]')
 
     active_item = browser.find_elements_by_xpath('//div[@class="components-home-assets-__sign-content_---item---1VLDOZ components-home-assets-__sign-content_---active---36unD3"]')
     
@@ -123,6 +130,7 @@ def auto_daily_checkin():
 
 def redeem_process():
     load_url(redeem_code_url)
+    accept_cookie_dialogue('//div[@class="mihoyo-cookie-tips__button mihoyo-cookie-tips__button--ys"]')
 
     # open div dropdown
     select = browser.find_elements_by_xpath('//div[@id="cdkey__region"]')
