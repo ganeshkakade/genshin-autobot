@@ -178,4 +178,4 @@ if __name__ == "__main__":
     auto_redeem_code()
     auto_daily_checkin()
     
-    browser.close()
+    browser.quit()
