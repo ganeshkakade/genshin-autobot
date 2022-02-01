@@ -73,10 +73,17 @@ def is_cookies_exists():
         return False
 
 def is_cookies_expired():
-    return True
+    cookies = browser.get_cookies()
+    return not(any("cookie_token" in i for i in cookies))
 
 def delete_cookie_relogin():
     browser.delete_all_cookies()
+
+    try:
+        os.remove(pickle_file_path)
+    except:
+        print("Error while deleting file ", pickle_file_path)
+
     auto_login()
 
 def auto_login():
@@ -119,9 +126,9 @@ def auto_daily_checkin():
         load_url(daily_checkin_url)
         load_cookies() # load cookies for daily_checkin_url
 
-        # not implemented, no cookies get expired??
-        # if is_cookies_expired():
-        #     delete_cookie_relogin()
+        # no cookies get expired??
+        if is_cookies_expired():
+            delete_cookie_relogin()
 
         daily_checkin_process()
     else:
@@ -164,10 +171,10 @@ def auto_redeem_code():
     if is_cookies_exists():
         load_url(redeem_code_url)
         load_cookies() # load cookies for redeem_code_url
-
-        # not implemented, no cookies get expired??
-        # if is_cookies_expired():
-        #     delete_cookie_relogin()
+        
+        # no cookies get expired??
+        if is_cookies_expired():
+            delete_cookie_relogin()
 
         redeem_process()
     else:
