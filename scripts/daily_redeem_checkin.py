@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 import pickle
 import time
 import os
@@ -38,15 +39,15 @@ def load_refresh_url(url):
 def scrap_redeem_codes():
     load_url(redeem_scraping_url)
 
-    code_list = browser.find_elements_by_xpath('//*[@id="site_wrap"]/article/div/ul[1]/li')
+    code_list = browser.find_elements(By.XPATH, '//*[@id="site_wrap"]/article/div/ul[1]/li')
 
     for item in code_list:
-        code = item.find_element_by_tag_name('strong')
+        code = item.find_element(By.TAG_NAME, 'strong')
         code = code.text.strip()
         codes.append(code)
 
 def accept_cookie_dialogue(elem_xpath):
-    dialogue_btn = browser.find_elements_by_xpath(elem_xpath)
+    dialogue_btn = browser.find_elements(By.XPATH, elem_xpath)
     if dialogue_btn:
         dialogue_btn[0].click()
 
@@ -74,7 +75,7 @@ def is_cookies_exists():
 
 def is_cookies_expired():
     cookies = browser.get_cookies()
-    return not(any("cookie_token" in i for i in cookies))
+    return not any(dict.get("name") == 'cookie_token' for dict in cookies)
 
 def delete_cookie_relogin():
     browser.delete_all_cookies()
@@ -90,16 +91,16 @@ def auto_login():
     load_url(login_url)
     accept_cookie_dialogue('//div[@class="mihoyo-cookie-tips__button mihoyo-cookie-tips__button--ys"]')
 
-    login = browser.find_elements_by_xpath("//button[@class='login__btn']")
+    login = browser.find_elements(By.XPATH, "//button[@class='login__btn']")
     login[0].click()
 
-    user = browser.find_elements_by_xpath('//form[@class="mhy-account-flow-password-login"]/div[1]/div/input')
+    user = browser.find_elements(By.XPATH, '//form[@class="mhy-account-flow-password-login"]/div[1]/div/input')
     user[0].send_keys(username)
 
-    pwd = browser.find_elements_by_xpath('//form[@class="mhy-account-flow-password-login"]/div[2]/div/input')
+    pwd = browser.find_elements(By.XPATH, '//form[@class="mhy-account-flow-password-login"]/div[2]/div/input')
     pwd[0].send_keys(password)
 
-    logged_in = browser.find_elements_by_xpath('//form[@class="mhy-account-flow-password-login"]/div[3]/button')
+    logged_in = browser.find_elements(By.XPATH, '//form[@class="mhy-account-flow-password-login"]/div[3]/button')
     logged_in[0].click()
 
     # wait time for log in to complete
@@ -113,7 +114,7 @@ def daily_checkin_process():
     load_refresh_url(daily_checkin_url)
     accept_cookie_dialogue('//button[@class="mihoyo-cookie-tips__button mihoyo-cookie-tips__button--hk4e"]')
 
-    active_item = browser.find_elements_by_xpath('//div[@class="components-home-assets-__sign-content_---item---1VLDOZ components-home-assets-__sign-content_---active---36unD3"]')
+    active_item = browser.find_elements(By.XPATH, '//div[@class="components-home-assets-__sign-content_---item---1VLDOZ components-home-assets-__sign-content_---active---36unD3"]')
     
     if active_item:
         active_item[0].click()
@@ -140,10 +141,10 @@ def redeem_process():
     accept_cookie_dialogue('//div[@class="mihoyo-cookie-tips__button mihoyo-cookie-tips__button--ys"]')
 
     # open div dropdown
-    select = browser.find_elements_by_xpath('//div[@id="cdkey__region"]')
+    select = browser.find_elements(By.XPATH, '//div[@id="cdkey__region"]')
     select[0].click()
 
-    select_options = browser.find_elements_by_xpath('//div[@class="cdkey-select__option"]')
+    select_options = browser.find_elements(By.XPATH, '//div[@class="cdkey-select__option"]')
 
     for option in select_options:
         if option.text == default_server:
@@ -151,8 +152,8 @@ def redeem_process():
             option.click()
             break
     
-    redeem = browser.find_elements_by_xpath('//input[@id="cdkey__code"]')
-    submit =  browser.find_elements_by_xpath('//button[@class="cdkey-form__submit"]')
+    redeem = browser.find_elements(By.XPATH, '//input[@id="cdkey__code"]')
+    submit =  browser.find_elements(By.XPATH, '//button[@class="cdkey-form__submit"]')
 
     for code in codes:
         redeem[0].clear()
@@ -167,7 +168,7 @@ def redeem_process():
 
 def auto_redeem_code():
     scrap_redeem_codes()
-
+   
     if is_cookies_exists():
         load_url(redeem_code_url)
         load_cookies() # load cookies for redeem_code_url
