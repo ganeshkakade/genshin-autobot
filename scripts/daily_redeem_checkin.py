@@ -13,7 +13,7 @@ password = "" # mihoyo genshin password
 default_server = "Asia" # "America" "Europe" "Asia" "TW, HK, MO"
 
 dir = os.path.dirname(__file__)
-msedgedriver = os.path.join(dir, '../drivers/msedgedriver_97.0.1072.69.exe')
+msedgedriver = os.path.join(dir, '../drivers/msedgedriver.exe')
 pickle_file_path = os.path.join(dir, 'genshin_mihoyo.pkl')
 
 browser = webdriver.Edge(msedgedriver)
